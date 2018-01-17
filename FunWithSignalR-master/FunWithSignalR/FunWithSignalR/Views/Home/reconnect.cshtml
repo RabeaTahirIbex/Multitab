@@ -1,0 +1,72 @@
+﻿
+@model FunWithSignalR.Models.listID
+
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>reconnect</title>
+</head>
+<body>
+    <script src="~/Scripts/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.0/jquery-confirm.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.0/jquery-confirm.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/Scripts/jquery.signalR-2.2.2.min.js"></script>
+    <script src="/signalr/hubs"></script>
+    <div>
+        <h1 id="openn" style="display:none">Already Open!</h1>
+        <script>
+            $(function () {
+                $.confirm({
+                    title: 'Confirm!',
+                    content: 'Activate this connection?',
+                    buttons: {
+                        confirm: function () {
+
+
+                            var zigChatHubProxy = $.connection.zigChatHub;
+                            zigChatHubProxy.client.updateUsersOnline = function (data) {
+                                if (!data.Success) {
+                                    alert(data.ErrorMessage);
+                                    return;
+                                }
+                                console.log("update re");
+
+                            };
+
+                            $.connection.hub.start()
+                                .done(function () {
+                                    var status = zigChatHubProxy.server.connectUser1(@Model.consistentUserID).done(function (data, textStatus, jqXHR) {
+                                        if (!data.Success) {
+                                            alert(data.ErrorMessage);
+                                            return;
+                                        }
+
+                                        // zigChatHubProxy.server.send(window.name, $('#userId').val());
+                                    });
+
+
+
+                                })
+                                .fail(function () {
+                                    console.log('Could not connect.');
+                                });
+
+
+
+
+                        },
+                        cancel: function () {
+                            $('#openn').show();
+                        }
+                    }
+                });
+            });
+
+        </script>
+    </div>
+</body>
+</html>
